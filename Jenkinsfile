@@ -35,7 +35,7 @@ spec:
    }
 
     parameters { 
-        string(name: 'DOCKER_REPOSITORY', defaultValue: 'sysdigcicd/cronagent', description: 'Name of the image to be built (e.g.: sysdiglabs/dummy-vuln-app)') 
+        string(name: 'DOCKER_REPOSITORY', defaultValue: 'programmerq/vulntest', description: 'Name of the image to be built (e.g.: sysdiglabs/dummy-vuln-app)') 
     }
     
     environment {
