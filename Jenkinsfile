@@ -53,15 +53,16 @@ spec:
         stage('Build Image') {
             steps {
                 container("dind") {
-                    sh "docker build -f Dockerfile -t ${params.DOCKER_REPOSITORY} ."
+                    sh "docker build -t ${params.DOCKER_REPOSITORY} ."
                     sh "echo ${params.DOCKER_REPOSITORY} > sysdig_secure_images"
                 }
             }
         }
         stage('Scanning Image') {
             steps {
-                // This will always be executed in the JNLP container
-                sysdig engineCredentialsId: 'sysdig-secure-api-credentials', name: 'sysdig_secure_images', inlineScanning: true
+                withCredentials([usernamePassword(credentialsId: 'sysdig-secure-api-credentials', passwordVariable: 'TOKEN', usernameVariable: '')]) {
+                    sh "docker run -v /var/run/docker.sock:/var/run/docker.sock analyze sysdiglabs/secure-inline-scan:latest -o -k ${TOKEN} $(cat sysdig_secure_images)"
+                }
             }
         }
    }
