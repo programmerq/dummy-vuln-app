@@ -61,7 +61,7 @@ spec:
         stage('Scanning Image') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'sysdig-secure-api-credentials', passwordVariable: 'TOKEN', usernameVariable: '')]) {
-                    sh "docker run -v /var/run/docker.sock:/var/run/docker.sock analyze sysdiglabs/secure-inline-scan:latest -o -k ${TOKEN} $(cat sysdig_secure_images)"
+                    sh "docker run -v /var/run/docker.sock:/var/run/docker.sock analyze sysdiglabs/secure-inline-scan:latest -o -k $TOKEN $(cat sysdig_secure_images)"
                 }
             }
         }
