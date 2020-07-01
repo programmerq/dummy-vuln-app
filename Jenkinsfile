@@ -54,14 +54,15 @@ spec:
             steps {
                 container("dind") {
                     sh "docker build -t ${params.DOCKER_REPOSITORY} ."
-                    sh "echo ${params.DOCKER_REPOSITORY} > sysdig_secure_images"
                 }
             }
         }
         stage('Scanning Image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'sysdig-secure-api-credentials', passwordVariable: 'TOKEN', usernameVariable: '')]) {
-                    sh "docker run -v /var/run/docker.sock:/var/run/docker.sock analyze sysdiglabs/secure-inline-scan:latest -o -k $TOKEN ${params.DOCKER_REPOSITORY}"
+                container("dind") {
+                    withCredentials([usernamePassword(credentialsId: 'sysdig-secure-api-credentials', passwordVariable: 'TOKEN', usernameVariable: '')]) {
+                        sh "docker run -v /var/run/docker.sock:/var/run/docker.sock analyze sysdiglabs/secure-inline-scan:latest -o -k $TOKEN ${params.DOCKER_REPOSITORY}"
+                    }
                 }
             }
         }
