@@ -63,6 +63,7 @@ spec:
                     withCredentials([usernamePassword(credentialsId: 'sysdig-secure-api-credentials', passwordVariable: 'TOKEN', usernameVariable: '')]) {
                         sh "docker run -v /var/run/docker.sock:/var/run/docker.sock sysdiglabs/secure-inline-scan:latest analyze -o -k $TOKEN ${params.DOCKER_REPOSITORY}"
                     }
+                }
             }
         }
         stage('Push Image') {
