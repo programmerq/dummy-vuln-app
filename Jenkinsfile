@@ -61,8 +61,14 @@ spec:
             steps {
                 container("dind") {
                     withCredentials([usernamePassword(credentialsId: 'sysdig-secure-api-credentials', passwordVariable: 'TOKEN', usernameVariable: '')]) {
-                        sh "docker run -v /var/run/docker.sock:/var/run/docker.sock analyze sysdiglabs/secure-inline-scan:latest -o -k $TOKEN ${params.DOCKER_REPOSITORY}"
+                        sh "docker run -v /var/run/docker.sock:/var/run/docker.sock sysdiglabs/secure-inline-scan:latest analyze -o -k $TOKEN ${params.DOCKER_REPOSITORY}"
                     }
+            }
+        }
+        stage('Push Image') {
+            steps {
+                container("dind") {
+                    sh "echo docker push ${params.DOCKER_REPOSITORY}"
                 }
             }
         }
