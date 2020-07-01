@@ -61,8 +61,9 @@ spec:
             steps {
                 container("dind") {
                     withCredentials([usernamePassword(credentialsId: 'sysdig-secure-api-credentials', passwordVariable: 'TOKEN', usernameVariable: '')]) {
-                        sh "docker run -v /var/run/docker.sock:/var/run/docker.sock sysdiglabs/secure-inline-scan:latest analyze -o -k $TOKEN ${params.DOCKER_REPOSITORY}"
+                        sh "docker run -v /var/run/docker.sock:/var/run/docker.sock sysdiglabs/secure-inline-scan:latest -v /out:/out analyze -C /out/ -k $TOKEN ${params.DOCKER_REPOSITORY}"
                     }
+                    archiveArtifacts artifacts: '/out/**.pdf', followSymlinks: false
                 }
             }
         }
