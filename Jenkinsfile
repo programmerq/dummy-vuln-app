@@ -53,7 +53,7 @@ spec:
         stage('Build Image') {
             steps {
                 container("dind") {
-                    sh "docker build -t ${params.DOCKER_REPOSITORY} ."
+                    sh "docker info && docker build -t ${params.DOCKER_REPOSITORY} . && docker image ls"
                 }
             }
         }
@@ -61,7 +61,7 @@ spec:
             steps {
                 container("dind") {
                     withCredentials([usernamePassword(credentialsId: 'sysdig-secure-api-credentials', passwordVariable: 'TOKEN', usernameVariable: '')]) {
-                        sh "docker run -v /var/run/docker.sock:/var/run/docker.sock -v /out:/out sysdiglabs/secure-inline-scan:latest analyze -R /out -k $TOKEN ${params.DOCKER_REPOSITORY}"
+                        sh "docker info && docker image ls && docker run -v /var/run/docker.sock:/var/run/docker.sock -v /out:/out sysdiglabs/secure-inline-scan:latest analyze -R /out -k $TOKEN ${params.DOCKER_REPOSITORY}"
                     }
                     archiveArtifacts artifacts: '/out/**.pdf', followSymlinks: false
                 }
@@ -70,7 +70,7 @@ spec:
         stage('Push Image') {
             steps {
                 container("dind") {
-                    sh "echo docker push ${params.DOCKER_REPOSITORY}"
+                    sh "docker info && docker image ls && echo docker push ${params.DOCKER_REPOSITORY}"
                 }
             }
         }
