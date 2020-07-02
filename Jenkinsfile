@@ -46,6 +46,7 @@ spec:
         stage('Checkout') {
             steps {
                 container("dind") {
+                    sh "docker pull sysdiglabs/secure-inline-scan:457a94c7 & docker pull anchore/inline-scan:v0.6.1 &" # start pulling this image asap
                     checkout scm
                 }
             }
@@ -53,7 +54,7 @@ spec:
         stage('Build Image') {
             steps {
                 container("dind") {
-                    sh "docker info && docker build -t ${params.DOCKER_REPOSITORY} . && docker image ls"
+                    sh "docker build -t ${params.DOCKER_REPOSITORY} ."
                 }
             }
         }
@@ -61,9 +62,7 @@ spec:
             steps {
                 container("dind") {
                     withCredentials([usernamePassword(credentialsId: 'sysdig-secure-api-credentials', passwordVariable: 'TOKEN', usernameVariable: '')]) {
-                        sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --entrypoint='' sysdiglabs/secure-inline-scan docker image ls; echo listed with socket bind"
-                        sh "docker info && docker image ls && docker run --rm -v /var/run/docker.sock:/var/run/docker.sock  -v /out:/out sysdiglabs/secure-inline-scan:457a94c7 analyze -R /out -k $TOKEN ${params.DOCKER_REPOSITORY}; ls -lah /out; echo end of scan"
-                        sh "echo after scan; ls -lah /out"
+                        sh "docker image ls && docker run --rm -v /var/run/docker.sock:/var/run/docker.sock  -v /out:/out sysdiglabs/secure-inline-scan:457a94c7 analyze -R /out -k $TOKEN ${params.DOCKER_REPOSITORY}; ls -lah /out; echo end of scan"
                     }
                 }
             }
@@ -81,7 +80,7 @@ spec:
             container("dind") {
             echo 'archiving pdfs'
             sh "ls -lah /out"
-            archiveArtifacts artifacts: '/out/**.pdf', followSymlinks: false
+            archiveArtifacts artifacts: '/out/*.pdf', followSymlinks: false
             }
         }
     }
