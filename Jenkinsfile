@@ -61,17 +61,17 @@ spec:
         stage('Scanning Image') {
             steps {
                 container("dind") {
-                    //sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock  -v \"$WORKSPACE/out:/out\" sysdiglabs/secure-inline-scan:latest analyze -o -s https://secure.example.com/ -R /out -k $TOKEN ${params.DOCKER_REPOSITORY}"
-                    sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock  -v \"$WORKSPACE/out:/out\" sysdiglabs/secure-inline-scan:latest analyze -R /out -k $TOKEN ${params.DOCKER_REPOSITORY}"
+                    withCredentials([usernamePassword(credentialsId: 'sysdig-secure-api-credentials', passwordVariable: 'TOKEN', usernameVariable: '')]) {
+                        //sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock  -v \"$WORKSPACE/out:/out\" sysdiglabs/secure-inline-scan:latest analyze -o -s https://secure.example.com/ -R /out -k $TOKEN ${params.DOCKER_REPOSITORY}"
+                        sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock  -v \"$WORKSPACE/out:/out\" sysdiglabs/secure-inline-scan:latest analyze -R /out -k $TOKEN ${params.DOCKER_REPOSITORY}"
+                    }
                 }
             }
         }
         stage('Push Image') {
             steps {
                 container("dind") {
-                    withCredentials([usernamePassword(credentialsId: 'sysdig-secure-api-credentials', passwordVariable: 'TOKEN', usernameVariable: '')]) {
-                        sh "docker push ${params.DOCKER_REPOSITORY}"
-                    }
+                    sh "docker push ${params.DOCKER_REPOSITORY}"
                 }
             }
         }
