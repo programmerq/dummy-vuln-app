@@ -62,8 +62,7 @@ spec:
             steps {
                 container("dind") {
                     withCredentials([usernamePassword(credentialsId: 'sysdig-secure-api-credentials', passwordVariable: 'TOKEN', usernameVariable: '')]) {
-                        sh "docker image ls && docker run --rm -v /var/run/docker.sock:/var/run/docker.sock  -v $WORKSPACE/out:/out sysdiglabs/secure-inline-scan:457a94c7 analyze -R /out -k $TOKEN ${params.DOCKER_REPOSITORY}; ls -lah /out; echo end of scan"
-                        sh "ls -lahd $WORKSPACE; ls -lah $WORKSPACE/out"
+                        sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock  -v \"$WORKSPACE/out:/out\" sysdiglabs/secure-inline-scan:457a94c7 analyze -R /out -k $TOKEN ${params.DOCKER_REPOSITORY};"
                     }
                 }
             }
@@ -80,7 +79,7 @@ spec:
         always { 
             container("dind") {
             echo 'archiving pdfs'
-            sh "pwd; echo workspace: $WORKSPACE; ls -lah out"
+            sh "pwd; echo workspace: $WORKSPACE; ls -lah out; echo"
             archiveArtifacts artifacts: 'out/*.pdf', followSymlinks: false
             }
         }
