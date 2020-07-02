@@ -61,7 +61,8 @@ spec:
             steps {
                 container("dind") {
                     withCredentials([usernamePassword(credentialsId: 'sysdig-secure-api-credentials', passwordVariable: 'TOKEN', usernameVariable: '')]) {
-                        sh "docker info && docker image ls && docker run -v /var/run/docker.sock:/var/run/docker.sock -v /out:/out sysdiglabs/secure-inline-scan:latest analyze -R /out -k $TOKEN ${params.DOCKER_REPOSITORY}; ls -lah /out; echo end of scan"
+                        sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --entrypoint='' sysdiglabs/secure-inline-scan docker image ls; echo listed with socket bind"
+                        sh "docker info && docker image ls && docker run -rm -v /var/run/docker.sock:/var/run/docker.sock  -v /out:/out sysdiglabs/secure-inline-scan:latest analyze -R /out -k $TOKEN ${params.DOCKER_REPOSITORY}; ls -lah /out; echo end of scan"
                         sh "echo after scan; ls -lah /out"
                     }
                 }
