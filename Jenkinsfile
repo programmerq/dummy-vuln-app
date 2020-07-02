@@ -46,7 +46,7 @@ spec:
         stage('Checkout') {
             steps {
                 container("dind") {
-                    sh "docker pull sysdiglabs/secure-inline-scan:457a94c7 & docker pull anchore/inline-scan:v0.6.1 &" 
+                    sh "docker pull sysdiglabs/secure-inline-scan:latest & docker pull anchore/inline-scan:v0.6.1 &" 
                     checkout scm
                 }
             }
@@ -61,16 +61,17 @@ spec:
         stage('Scanning Image') {
             steps {
                 container("dind") {
-                    withCredentials([usernamePassword(credentialsId: 'sysdig-secure-api-credentials', passwordVariable: 'TOKEN', usernameVariable: '')]) {
-                        sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock  -v \"$WORKSPACE/out:/out\" sysdiglabs/secure-inline-scan:457a94c7 analyze -R /out -k $TOKEN ${params.DOCKER_REPOSITORY};"
-                    }
+                    //sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock  -v \"$WORKSPACE/out:/out\" sysdiglabs/secure-inline-scan:latest analyze -o -s https://secure.example.com/ -R /out -k $TOKEN ${params.DOCKER_REPOSITORY}"
+                    sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock  -v \"$WORKSPACE/out:/out\" sysdiglabs/secure-inline-scan:latest analyze -R /out -k $TOKEN ${params.DOCKER_REPOSITORY}"
                 }
             }
         }
         stage('Push Image') {
             steps {
                 container("dind") {
-                    sh "docker info && docker image ls && echo docker push ${params.DOCKER_REPOSITORY}"
+                    withCredentials([usernamePassword(credentialsId: 'sysdig-secure-api-credentials', passwordVariable: 'TOKEN', usernameVariable: '')]) {
+                        sh "docker push ${params.DOCKER_REPOSITORY}"
+                    }
                 }
             }
         }
@@ -78,9 +79,8 @@ spec:
     post { 
         always { 
             container("dind") {
-            echo 'archiving pdfs'
-            sh "pwd; echo workspace: $WORKSPACE; ls -lah out; echo"
-            archiveArtifacts artifacts: 'out/*.pdf', followSymlinks: false
+                echo 'archiving scan result pdf'
+                archiveArtifacts artifacts: 'out/*.pdf', followSymlinks: false
             }
         }
     }
