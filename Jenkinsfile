@@ -35,7 +35,7 @@ spec:
    }
 
     parameters { 
-        string(name: 'DOCKER_REPOSITORY', defaultValue: 'programmerq/vulntest', description: 'Name of the image to be built (e.g.: sysdiglabs/dummy-vuln-app)') 
+        string(name: 'DOCKER_REPOSITORY', defaultValue: 'sysdiglabs/dummy-vuln-app', description: 'Name of the image to be built (e.g.: sysdiglabs/dummy-vuln-app)') 
     }
     
     environment {
