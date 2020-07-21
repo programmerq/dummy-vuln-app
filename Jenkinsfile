@@ -46,7 +46,6 @@ spec:
         stage('Checkout') {
             steps {
                 container("dind") {
-                    sh "docker pull sysdiglabs/secure-inline-scan:latest & docker pull anchore/inline-scan:v0.6.1 &" 
                     checkout scm
                 }
             }
